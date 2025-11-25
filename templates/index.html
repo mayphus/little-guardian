@@ -56,31 +56,29 @@
 
     .container {
       width: 100%;
-      max-width: 480px;
-      /* Tighter width for mobile-first feel */
-      padding: 24px;
+      height: 100vh;
+      padding: 0;
       display: flex;
-      flex-direction: column;
-      gap: 32px;
+      align-items: center;
+      justify-content: center;
+      background: #000;
     }
 
     /* Video Feed */
     .video-wrapper {
-      position: relative;
       width: 100%;
-      background: #000;
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      box-shadow: 0 20px 25px -5px var(--shadow-color), 0 8px 10px -6px var(--shadow-color);
-      border: 1px solid var(--border-color);
-      aspect-ratio: 16/9;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     #video {
-      width: 100%;
-      height: 100%;
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
       object-fit: contain;
-      display: block;
     }
 
     /* Controls Container */
@@ -182,37 +180,7 @@
     </div>
 
     <!-- Controls -->
-    <div class="controls-panel">
-      <div class="d-pad">
-        <div class="btn-ptz spacer"></div>
-        <button class="btn-ptz" data-action="up" aria-label="Up">
-          <svg class="icon" viewBox="0 0 24 24">
-            <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z" />
-          </svg>
-        </button>
-        <div class="btn-ptz spacer"></div>
-
-        <button class="btn-ptz" data-action="left" aria-label="Left">
-          <svg class="icon" viewBox="0 0 24 24">
-            <path d="M15.41 7.41L10.83 12l4.58 4.59L14 18l-6-6 6-6z" />
-          </svg>
-        </button>
-        <div class="btn-ptz spacer"></div>
-        <button class="btn-ptz" data-action="right" aria-label="Right">
-          <svg class="icon" viewBox="0 0 24 24">
-            <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
-          </svg>
-        </button>
-
-        <div class="btn-ptz spacer"></div>
-        <button class="btn-ptz" data-action="down" aria-label="Down">
-          <svg class="icon" viewBox="0 0 24 24">
-            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z" />
-          </svg>
-        </button>
-        <div class="btn-ptz spacer"></div>
-      </div>
-    </div>
+    <!-- Removed -->
   </div>
 
   <div class="status-toast" id="status">Ready</div>
@@ -229,28 +197,6 @@
         statusEl.classList.remove('visible');
       }, 2000);
     }
-
-    async function sendAction(action) {
-      try {
-        const res = await fetch('/ptz', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action })
-        });
-        const data = await res.json();
-        showStatus(data.message || (res.ok ? 'OK' : 'Error'));
-      } catch (err) {
-        showStatus('Request failed');
-      }
-    }
-
-    // PTZ Buttons
-    document.querySelectorAll('[data-action]').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        if (navigator.vibrate) navigator.vibrate(10);
-        sendAction(btn.dataset.action);
-      });
-    });
   </script>
 </body>
 

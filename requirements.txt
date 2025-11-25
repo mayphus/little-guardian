@@ -3,3 +3,4 @@ onvif-zeep
 opencv-python-headless
 python-dotenv
 numpy
+ultralytics
