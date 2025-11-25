@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Baby Monitor</title>
+  <style>
+    :root {
+      /* Light Mode (Default) */
+      --bg-color: #f4f4f5;
+      --panel-bg: #ffffff;
+      --text-primary: #18181b;
+      --text-secondary: #71717a;
+      --accent-color: #3b82f6;
+      --accent-hover: #2563eb;
+      --border-color: #e4e4e7;
+      --shadow-color: rgba(0, 0, 0, 0.1);
+      --radius-lg: 24px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        /* Dark Mode */
+        --bg-color: #09090b;
+        --panel-bg: #18181b;
+        --text-primary: #f4f4f5;
+        --text-secondary: #a1a1aa;
+        --accent-color: #3b82f6;
+        --accent-hover: #2563eb;
+        --border-color: #27272a;
+        --shadow-color: rgba(0, 0, 0, 0.5);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: var(--bg-color);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 480px;
+      /* Tighter width for mobile-first feel */
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    /* Video Feed */
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      background: #000;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: 0 20px 25px -5px var(--shadow-color), 0 8px 10px -6px var(--shadow-color);
+      border: 1px solid var(--border-color);
+      aspect-ratio: 16/9;
+    }
+
+    #video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    /* Controls Container */
+    .controls-panel {
+      background: var(--panel-bg);
+      padding: 32px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -2px var(--shadow-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    /* D-Pad */
+    .d-pad {
+      display: grid;
+      grid-template-columns: repeat(3, 56px);
+      grid-template-rows: repeat(3, 56px);
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .btn-ptz {
+      width: 56px;
+      height: 56px;
+      border: none;
+      border-radius: var(--radius-md);
+      background: var(--bg-color);
+      color: var(--text-primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      font-size: 24px;
+      box-shadow: 0 1px 2px 0 var(--shadow-color);
+    }
+
+    .btn-ptz:active {
+      transform: scale(0.92);
+    }
+
+    .btn-ptz:hover {
+      background: var(--accent-color);
+      color: white;
+    }
+
+    /* Spacer (Center) */
+    .btn-ptz.spacer {
+      background: transparent;
+      box-shadow: none;
+      cursor: default;
+    }
+
+    .btn-ptz.spacer:hover {
+      background: transparent;
+    }
+
+    /* Icons */
+    .icon {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+    }
+
+    /* Status Toast */
+    .status-toast {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(8px);
+      padding: 10px 20px;
+      border-radius: 9999px;
+      font-size: 14px;
+      font-weight: 500;
+      color: white;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 100;
+    }
+
+    .status-toast.visible {
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <!-- Video Feed -->
+    <div class="video-wrapper">
+      <img id="video" src="/video.mjpg" alt="Live Stream">
+    </div>
+
+    <!-- Controls -->
+    <div class="controls-panel">
+      <div class="d-pad">
+        <div class="btn-ptz spacer"></div>
+        <button class="btn-ptz" data-action="up" aria-label="Up">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z" />
+          </svg>
+        </button>
+        <div class="btn-ptz spacer"></div>
+
+        <button class="btn-ptz" data-action="left" aria-label="Left">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M15.41 7.41L10.83 12l4.58 4.59L14 18l-6-6 6-6z" />
+          </svg>
+        </button>
+        <div class="btn-ptz spacer"></div>
+        <button class="btn-ptz" data-action="right" aria-label="Right">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
+          </svg>
+        </button>
+
+        <div class="btn-ptz spacer"></div>
+        <button class="btn-ptz" data-action="down" aria-label="Down">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z" />
+          </svg>
+        </button>
+        <div class="btn-ptz spacer"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="status-toast" id="status">Ready</div>
+
+  <script>
+    const statusEl = document.getElementById('status');
+    let statusTimeout;
+
+    function showStatus(msg) {
+      statusEl.textContent = msg;
+      statusEl.classList.add('visible');
+      clearTimeout(statusTimeout);
+      statusTimeout = setTimeout(() => {
+        statusEl.classList.remove('visible');
+      }, 2000);
+    }
+
+    async function sendAction(action) {
+      try {
+        const res = await fetch('/ptz', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action })
+        });
+        const data = await res.json();
+        showStatus(data.message || (res.ok ? 'OK' : 'Error'));
+      } catch (err) {
+        showStatus('Request failed');
+      }
+    }
+
+    // PTZ Buttons
+    document.querySelectorAll('[data-action]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        if (navigator.vibrate) navigator.vibrate(10);
+        sendAction(btn.dataset.action);
+      });
+    });
+  </script>
+</body>
+
+</html>
