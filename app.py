@@ -219,6 +219,7 @@ def health():
 
 
 from ultralytics import YOLO
+from ultralytics.utils.plotting import colors
 
 class Tracker:
     def __init__(self):
@@ -228,34 +229,23 @@ class Tracker:
         self.boxes = []
 
     def draw_hud(self, frame, x1, y1, x2, y2, label="Baby"):
-        # Color: Cyan (BGR)
-        color = (255, 255, 0)
-        thickness = 2
-        line_len = 20
-
-        # Corner Brackets
-        # Top-Left
-        cv2.line(frame, (x1, y1), (x1 + line_len, y1), color, thickness)
-        cv2.line(frame, (x1, y1), (x1, y1 + line_len), color, thickness)
-        # Top-Right
-        cv2.line(frame, (x2, y1), (x2 - line_len, y1), color, thickness)
-        cv2.line(frame, (x2, y1), (x2, y1 + line_len), color, thickness)
-        # Bottom-Left
-        cv2.line(frame, (x1, y2), (x1 + line_len, y2), color, thickness)
-        cv2.line(frame, (x1, y2), (x1, y2 - line_len), color, thickness)
-        # Bottom-Right
-        cv2.line(frame, (x2, y2), (x2 - line_len, y2), color, thickness)
-        cv2.line(frame, (x2, y2), (x2, y2 - line_len), color, thickness)
-
-        # Center Crosshair
-        cx, cy = (x1 + x2) // 2, (y1 + y2) // 2
-        cv2.line(frame, (cx - 10, cy), (cx + 10, cy), color, 1)
-        cv2.line(frame, (cx, cy - 10), (cx, cy + 10), color, 1)
-
-        # Label with background
-        (w, h), _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 1)
-        cv2.rectangle(frame, (x1, y1 - 25), (x1 + w + 10, y1), color, -1)
-        cv2.putText(frame, label, (x1 + 5, y1 - 8), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 1)
+        # Get color for class 0 (Person) from ultralytics
+        # colors returns RGB, convert to BGR for OpenCV
+        r, g, b = colors(0, True)
+        color = (b, g, r)
+        
+        # Box
+        cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
+        
+        # Label
+        font_thickness = 1
+        font_scale = 0.6
+        text_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, font_scale, font_thickness)[0]
+        
+        c2 = x1 + text_size[0], y1 - text_size[1] - 3
+        
+        cv2.rectangle(frame, (x1, y1), c2, color, -1, cv2.LINE_AA)  # filled
+        cv2.putText(frame, label, (x1, y1 - 2), 0, font_scale, (255, 255, 255), font_thickness, lineType=cv2.LINE_AA)
 
     def draw_overlay(self, frame):
         # Draw all current boxes
