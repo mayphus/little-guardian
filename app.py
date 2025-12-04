@@ -239,7 +239,7 @@ class Tracker:
         
         # Label
         font_thickness = 1
-        font_scale = 0.6
+        font_scale = 1
         text_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, font_scale, font_thickness)[0]
         
         c2 = x1 + text_size[0], y1 - text_size[1] - 3
