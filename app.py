@@ -249,8 +249,8 @@ class Tracker:
 
     def draw_overlay(self, frame):
         # Draw all current boxes
-        for (x1, y1, x2, y2) in self.boxes:
-            self.draw_hud(frame, x1, y1, x2, y2)
+        for (x1, y1, x2, y2, label) in self.boxes:
+            self.draw_hud(frame, x1, y1, x2, y2, label)
 
     def start(self):
         threading.Thread(target=self._loop, daemon=True).start()
@@ -275,7 +275,7 @@ class Tracker:
                 inp = frame
 
             # Run inference
-            results = self.model(inp, classes=[0], verbose=False)
+            results = self.model(inp, verbose=False)
 
             new_boxes = []
             for result in results:
@@ -283,11 +283,14 @@ class Tracker:
                 for box in boxes:
                     # Bounding box coordinates (scaled back)
                     x1, y1, x2, y2 = box.xyxy[0].cpu().numpy()
+                    cls = int(box.cls[0].item())
+                    label = self.model.names[cls]
+                    
                     if scale < 1:
                         x1, y1, x2, y2 = x1/scale, y1/scale, x2/scale, y2/scale
                     
                     x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
-                    new_boxes.append((x1, y1, x2, y2))
+                    new_boxes.append((x1, y1, x2, y2, label))
             
             self.boxes = new_boxes
             time.sleep(0.5) # Run inference only twice per second
