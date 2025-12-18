@@ -7,27 +7,34 @@
   <title>Baby Monitor</title>
   <style>
     :root {
-      --bg-color: #09090b;
-      --panel-bg: rgba(24, 24, 27, 0.8);
-      --text-primary: #f4f4f5;
-      --text-secondary: #a1a1aa;
+      --bg-color: #0c0c0e;
+      --panel-bg: rgba(28, 28, 30, 0.4);
+      --text-primary: #ffffff;
+      --text-secondary: #9a9a9e;
       --accent-color: #3b82f6;
-      --accent-hover: #2563eb;
-      --border-color: rgba(255, 255, 255, 0.1);
-      --shadow-color: rgba(0, 0, 0, 0.5);
-      --radius-lg: 24px;
-      --radius-md: 16px;
+      --accent-hover: #60a5fa;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --glass-border: rgba(255, 255, 255, 0.12);
+      --shadow-lg: 0 12px 40px -12px rgba(0, 0, 0, 0.8);
+      --radius-full: 9999px;
+      --radius-lg: 32px;
+      --radius-md: 20px;
       --radius-sm: 12px;
-      --focus-ring: 0 0 0 3px rgba(59, 130, 246, 0.35);
+    }
+
+    @font-face {
+      font-family: 'Outfit';
+      src: url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap');
     }
 
     * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
+      outline: none;
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       margin: 0;
       padding: 0;
       background: var(--bg-color);
@@ -38,88 +45,63 @@
       align-items: center;
       justify-content: center;
       color-scheme: dark;
+      overflow-x: hidden;
     }
 
     .container {
-      width: 95%;
-      max-width: 1400px;
+      width: 100%;
+      max-width: 1200px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 24px;
-      padding: 20px;
+      gap: 32px;
+      padding: 24px;
+      animation: fadeIn 0.8s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .top-bar {
       width: 100%;
-      max-width: 800px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
+      gap: 16px;
+      padding: 0 8px;
     }
 
     .title {
       display: flex;
       flex-direction: column;
-      gap: 4px;
-      min-width: 0;
+      gap: 2px;
     }
 
     .title h1 {
       margin: 0;
-      font-size: 18px;
-      line-height: 1.2;
-      font-weight: 650;
-      letter-spacing: 0.01em;
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #fff 0%, #a1a1aa 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     .subtitle {
       margin: 0;
       font-size: 13px;
       color: var(--text-secondary);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .badges {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-shrink: 0;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
-      border-radius: 9999px;
-      border: 1px solid var(--border-color);
-      background: rgba(255, 255, 255, 0.04);
-      color: var(--text-primary);
-      font-size: 13px;
-      font-weight: 600;
-      user-select: none;
-    }
-
-    .dot {
-      width: 9px;
-      height: 9px;
-      border-radius: 50%;
-      background: #f59e0b;
-      box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.15);
-    }
-
-    .dot.ok {
-      background: #22c55e;
-      box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.15);
-    }
-
-    .dot.bad {
-      background: #ef4444;
-      box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.15);
+      font-weight: 300;
     }
 
     /* Video Player */
@@ -128,9 +110,10 @@
       position: relative;
       border-radius: var(--radius-lg);
       overflow: hidden;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+      box-shadow: var(--shadow-lg);
       background: #000;
       aspect-ratio: 16/9;
+      border: 1px solid var(--glass-border);
     }
 
     #video {
@@ -138,6 +121,7 @@
       height: 100%;
       object-fit: contain;
       display: block;
+      transition: object-fit 0.3s ease;
     }
 
     #canvas_overlay {
@@ -150,385 +134,306 @@
       z-index: 5;
     }
 
-    .video-overlay {
+    /* Floating Video Controls Overlay */
+    .video-controls-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px;
+      background: linear-gradient(0deg, rgba(0, 0, 0, 0.4) 0%, transparent 40%, transparent 60%, rgba(0, 0, 0, 0.4) 100%);
+      pointer-events: none;
+    }
+
+    .video-wrapper:hover .video-controls-overlay {
+      opacity: 1;
+    }
+
+    .overlay-actions-top {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    .overlay-actions-bottom {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      align-items: center;
+    }
+
+    .video-overlay-msg {
       position: absolute;
       inset: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      pointer-events: none;
-      background: radial-gradient(transparent 40%, rgba(0, 0, 0, 0.5));
-      opacity: 0;
-      transition: opacity 0.2s ease;
-    }
-
-    .video-overlay.visible {
-      opacity: 1;
-    }
-
-    .overlay-card {
-      pointer-events: auto;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      padding: 14px 16px;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border-color);
-      background: rgba(0, 0, 0, 0.6);
+      background: rgba(0, 0, 0, 0.7);
       backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      z-index: 20;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
     }
 
-    .overlay-title {
-      font-size: 14px;
-      font-weight: 650;
-      margin: 0;
+    .video-overlay-msg.visible {
+      opacity: 1;
+      pointer-events: auto;
     }
 
-    .overlay-subtitle {
-      font-size: 13px;
-      color: var(--text-secondary);
-      margin: 0;
+    .msg-card {
       text-align: center;
-      max-width: 46ch;
+      padding: 32px;
+      max-width: 320px;
     }
 
-    /* Control Bar */
-    .control-bar {
-      width: 100%;
-      max-width: 800px;
-      background: var(--panel-bg);
+    .msg-card h2 {
+      margin: 0 0 8px;
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .msg-card p {
+      margin: 0 0 24px;
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* Floating Controls */
+    .floating-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-full);
+      background: rgba(255, 255, 255, 0.08);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-md);
-      padding: 16px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 20px;
-    }
-
-    .control-group {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .control-label {
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--text-secondary);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    /* Buttons */
-    .btn {
-      width: 44px;
-      height: 44px;
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--text-primary);
-      cursor: pointer;
+      border: 1px solid var(--glass-border);
+      color: white;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.2s ease;
-      touch-action: manipulation;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: auto;
     }
 
-    .btn:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.2);
+    .floating-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.4);
     }
 
-    .btn:active {
-      transform: scale(0.95);
+    .floating-btn:active {
+      transform: translateY(0);
     }
 
-    .btn:focus-visible {
-      outline: none;
-      box-shadow: var(--focus-ring);
-      border-color: rgba(59, 130, 246, 0.55);
+    .floating-btn svg {
+      width: 22px;
+      height: 22px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
 
-    .btn.primary {
-      background: rgba(59, 130, 246, 0.18);
-      border-color: rgba(59, 130, 246, 0.45);
-    }
-
-    .btn.primary:hover {
-      background: rgba(59, 130, 246, 0.28);
-      border-color: rgba(59, 130, 246, 0.65);
-    }
-
-    .btn.wide {
-      width: auto;
-      padding: 0 12px;
-      gap: 10px;
-      border-radius: var(--radius-sm);
-      font-weight: 650;
-      font-size: 13px;
-    }
-
-    .btn svg {
-      width: 20px;
-      height: 20px;
-      fill: currentColor;
-    }
-
-    .ptz-pad {
+    /* Directional/Joystick Hub */
+    .control-hub {
       display: grid;
       grid-template-columns: repeat(3, 44px);
       grid-template-rows: repeat(3, 44px);
       gap: 10px;
-      padding: 6px;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border-color);
-      background: rgba(255, 255, 255, 0.03);
+      align-items: center;
+      justify-content: center;
+      pointer-events: auto;
     }
 
-    .ptz-pad .btn {
+    .hub-btn.up {
+      grid-area: 1 / 2 / 2 / 3;
+    }
+
+    .hub-btn.left {
+      grid-area: 2 / 1 / 3 / 2;
+    }
+
+    .hub-btn.right {
+      grid-area: 2 / 3 / 3 / 4;
+    }
+
+    .hub-btn.down {
+      grid-area: 3 / 2 / 4 / 3;
+    }
+
+    .hub-btn {
       width: 44px;
       height: 44px;
-      border-radius: var(--radius-sm);
-    }
-
-    .ptz-pad .btn.center {
-      background: rgba(255, 255, 255, 0.06);
-    }
-
-    .ptz-pad .spacer {
-      width: 44px;
-      height: 44px;
-    }
-
-    .aux-controls {
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--glass-border);
+      color: white;
       display: flex;
       align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    /* Toggle Switch */
-    .toggle-switch {
-      position: relative;
-      width: 52px;
-      height: 28px;
-    }
-
-    .toggle-switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-
-    .slider {
-      position: absolute;
+      justify-content: center;
       cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: rgba(255, 255, 255, 0.1);
-      transition: .4s;
-      border-radius: 34px;
-      border: 1px solid var(--border-color);
+      transition: all 0.15s;
     }
 
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 20px;
+    .hub-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .hub-btn:active {
+      transform: scale(0.92);
+    }
+
+    .hub-btn.center {
+      background: var(--accent-color);
+      border: none;
+      box-shadow: 0 4px 15px -4px var(--accent-color);
+    }
+
+    .hub-btn svg {
       width: 20px;
-      left: 3px;
-      bottom: 3px;
-      background-color: white;
-      transition: .4s;
-      border-radius: 50%;
+      height: 20px;
+      stroke-width: 2.5;
     }
 
-    input:checked+.slider {
-      background-color: var(--accent-color);
+    /* Action Buttons */
+    .action-btn {
+      padding: 10px 18px;
+      border-radius: var(--radius-full);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--glass-border);
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .action-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .action-btn.active {
+      background: var(--accent-color);
       border-color: var(--accent-color);
     }
 
-    input:checked+.slider:before {
-      transform: translateX(24px);
+    /* Custom Switch */
+    .toggle-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .switch {
+      width: 40px;
+      height: 22px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 3px;
+      transition: background 0.3s;
+      position: relative;
+    }
+
+    .switch::after {
+      content: '';
+      width: 16px;
+      height: 16px;
+      background: white;
+      border-radius: 50%;
+      display: block;
+      transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.35, 1.15);
+    }
+
+    input:checked+.switch {
+      background: var(--accent-color);
+    }
+
+    input:checked+.switch::after {
+      transform: translateX(18px);
     }
 
     /* Status Toast */
     .status-toast {
       position: fixed;
-      bottom: 32px;
+      bottom: 40px;
       left: 50%;
       transform: translateX(-50%) translateY(100px);
-      background: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(8px);
-      padding: 10px 20px;
-      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.95);
+      color: #000;
+      padding: 12px 24px;
+      border-radius: var(--radius-full);
       font-size: 14px;
-      font-weight: 500;
-      color: white;
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      font-weight: 600;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+      transition: transform 0.5s cubic-bezier(0.17, 0.84, 0.44, 1);
       z-index: 100;
-      pointer-events: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
     .status-toast.visible {
       transform: translateX(-50%) translateY(0);
     }
 
-    @media (prefers-reduced-motion: reduce) {
-      .status-toast {
-        transition: none;
-      }
-
-      .btn {
-        transition: none;
-      }
-    }
-
-    /* Mobile Optimization */
+    /* Responsive */
     @media (max-width: 768px) {
       .container {
-        width: 100%;
-        padding: 12px;
-        gap: 16px;
+        padding: 16px;
+        gap: 20px;
       }
 
       .top-bar {
-        max-width: 100%;
-      }
-
-      .badges .badge {
-        padding: 7px 10px;
-        font-size: 12px;
-      }
-
-      .video-wrapper {
-        border-radius: var(--radius-md);
-      }
-
-      .control-bar {
         flex-direction: column;
-        align-items: stretch;
-        gap: 20px;
-        padding: 20px;
+        align-items: flex-start;
+        gap: 12px;
       }
 
-      .control-group {
-        width: 100%;
-        justify-content: space-between;
+      .video-controls-overlay {
+        opacity: 1;
+        pointer-events: auto;
+        background: none;
       }
 
-      .control-label {
+      .overlay-actions-top {
         display: none;
-        /* Hide labels to save space */
       }
 
-      .btn {
-        width: 40px;
-        height: 40px;
-        background: rgba(0, 0, 0, 0.3);
-      }
-
-      .ptz-pad {
-        grid-template-columns: repeat(3, 40px);
-        grid-template-rows: repeat(3, 40px);
-      }
-
-      .ptz-pad .btn,
-      .ptz-pad .spacer {
-        width: 40px;
-        height: 40px;
-      }
-
-      .aux-controls {
-        justify-content: space-between;
+      .video-wrapper:hover .video-controls-overlay {
+        opacity: 1;
       }
     }
 
-    /* Mobile Landscape Optimization */
     @media (max-height: 500px) and (orientation: landscape) {
       .container {
-        width: 100vw;
-        height: 100vh;
         padding: 0;
-        margin: 0;
-        gap: 0;
+        max-width: none;
       }
 
       .top-bar {
-        position: fixed;
-        top: 14px;
-        left: 14px;
-        right: 14px;
-        max-width: none;
-        z-index: 20;
-        pointer-events: none;
-      }
-
-      .top-bar>* {
-        pointer-events: auto;
+        display: none;
       }
 
       .video-wrapper {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
         border-radius: 0;
-        z-index: 0;
-      }
-
-      .control-bar {
-        position: fixed;
-        bottom: 16px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: auto;
-        min-width: 300px;
-        padding: 8px 16px;
-        flex-direction: row;
-        /* Keep horizontal in landscape */
-        gap: 24px;
-        background: rgba(24, 24, 27, 0.6);
-        /* More transparent */
-        backdrop-filter: blur(4px);
-        z-index: 10;
-        border-radius: 9999px;
-        /* Pill shape */
-      }
-
-      .control-group {
-        width: auto;
-        justify-content: center;
-      }
-
-      .control-label {
-        display: none;
-        /* Hide labels to save space */
-      }
-
-      .btn {
-        width: 40px;
-        height: 40px;
-        background: rgba(0, 0, 0, 0.3);
-      }
-
-      .ptz-pad {
         border: none;
-        background: transparent;
-        padding: 0;
-        gap: 10px;
+        height: 100vh;
       }
+
     }
   </style>
 </head>
@@ -536,127 +441,84 @@
 <body>
 
   <div class="container">
-    <div class="top-bar">
+    <header class="top-bar">
       <div class="title">
         <h1>Baby Monitor</h1>
-        <p class="subtitle" id="hint">Arrow keys: move • +/-: zoom • F: fullscreen</p>
+        <p class="subtitle" id="hint">Arrow keys • +/- Zoom • F Fullscreen</p>
       </div>
-      <div class="badges">
-        <div class="badge" id="streamBadge" title="Stream status">
-          <span class="dot" id="streamDot"></span>
-          <span id="streamText">Connecting</span>
-        </div>
-        <div class="badge" id="trackingBadge" title="Tracking status">
-          <span class="dot" id="trackingDot"></span>
-          <span id="trackingText">Tracking</span>
-        </div>
-      </div>
-    </div>
+    </header>
 
-    <!-- Video Feed -->
-    <div class="video-wrapper">
+    <main class="video-wrapper">
       <img id="video" src="/video.mjpg" alt="Live Stream" decoding="async">
       <canvas id="canvas_overlay"></canvas>
-      <div class="video-overlay" id="videoOverlay" aria-hidden="true">
-        <div class="overlay-card">
-          <p class="overlay-title" id="overlayTitle">Stream issue</p>
-          <p class="overlay-subtitle" id="overlaySubtitle">Trying to reconnect…</p>
-          <button class="btn wide primary" id="reloadBtn" type="button" aria-label="Reload stream">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                d="M17.65 6.35A7.95 7.95 0 0012 4V1L7 6l5 5V7a6 6 0 11-6 6H4a8 8 0 108-8c-1.85 0-3.55.63-4.9 1.69L8.1 8.69A6.02 6.02 0 0112 7a6 6 0 016 6 6 6 0 01-10.24 4.24l-1.42 1.42A8 8 0 1017.65 6.35z" />
-            </svg>
-            Reload
-          </button>
-        </div>
-      </div>
-    </div>
 
-    <!-- Controls -->
-    <div class="control-bar">
-      <!-- PTZ -->
-      <div class="control-group">
-        <span class="control-label">Camera</span>
-        <div class="ptz-pad" aria-label="Pan tilt controls">
-          <div class="spacer" aria-hidden="true"></div>
-          <button class="btn" data-ptz="up" type="button" title="Tilt Up" aria-label="Tilt up">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z" />
-            </svg>
-          </button>
-          <div class="spacer" aria-hidden="true"></div>
-
-          <button class="btn" data-ptz="left" type="button" title="Pan Left" aria-label="Pan left">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
-            </svg>
-          </button>
-          <button class="btn center" data-ptz="home" type="button" title="Home" aria-label="Home position">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
-            </svg>
-          </button>
-          <button class="btn" data-ptz="right" type="button" title="Pan Right" aria-label="Pan right">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
-            </svg>
-          </button>
-
-          <div class="spacer" aria-hidden="true"></div>
-          <button class="btn" data-ptz="down" type="button" title="Tilt Down" aria-label="Tilt down">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z" />
-            </svg>
-          </button>
-          <div class="spacer" aria-hidden="true"></div>
-        </div>
-      </div>
-
-      <!-- Tracking -->
-      <div class="control-group">
-        <span class="control-label">AI Tracking</span>
-        <div class="aux-controls">
-          <button class="btn" id="zoomOutBtn" data-ptz="zoom_out" type="button" title="Zoom Out" aria-label="Zoom out">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zM9.5 14C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14zM7 9h5v1H7z" />
-            </svg>
-          </button>
-          <button class="btn" id="zoomInBtn" data-ptz="zoom_in" type="button" title="Zoom In" aria-label="Zoom in">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zM9.5 14C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14zM10 7h-1v2H7v1h2v2h1v-2h2V9h-2V7z" />
-            </svg>
-          </button>
-          <button class="btn" id="stopBtn" data-ptz="stop" type="button" title="Stop" aria-label="Stop movement">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M6 6h12v12H6z" />
-            </svg>
-          </button>
-          <button class="btn" id="fitBtn" type="button" title="Toggle fit" aria-label="Toggle fit mode">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M7 14H5v5h5v-2H7v-3zm0-4h2V7h3V5H5v5zm10 7h-3v2h5v-5h-2v3zm0-12V5h-5v2h3v3h2V5z" />
-            </svg>
-          </button>
-          <button class="btn" id="fsBtn" type="button" title="Fullscreen" aria-label="Toggle fullscreen">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M7 14H5v5h5v-2H7v-3zm0-4h2V7h3V5H5v5zm10 7h-3v2h5v-5h-2v3zm0-12V5h-5v2h3v3h2V5z" />
-            </svg>
-          </button>
-          <label class="toggle-switch" title="Toggle tracking">
-            <input type="checkbox" id="trackingToggle" aria-label="Toggle AI tracking">
-            <span class="slider"></span>
+      <!-- Premium Floating Controls -->
+      <div class="video-controls-overlay">
+        <div class="overlay-actions-top">
+          <label class="toggle-group" title="Toggle AI Tracking" style="pointer-events: auto;">
+            <input type="checkbox" id="trackingToggle" hidden>
+            <div class="switch"></div>
           </label>
+          <button class="floating-btn" id="quickReload" title="Refresh Stream">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+            </svg>
+          </button>
+          <button class="floating-btn" id="fsBtn" title="Fullscreen">
+            <svg viewBox="0 0 24 24">
+              <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="overlay-actions-bottom">
+          <div class="control-hub">
+            <button class="hub-btn up" data-ptz="up" title="Up"><svg viewBox="0 0 24 24" fill="none"
+                stroke="currentColor">
+                <path d="M18 15l-6-6-6 6" />
+              </svg></button>
+            <button class="hub-btn left" data-ptz="left" title="Left"><svg viewBox="0 0 24 24" fill="none"
+                stroke="currentColor">
+                <path d="M15 18l-6-6 6-6" />
+              </svg></button>
+            <button class="hub-btn right" data-ptz="right" title="Right"><svg viewBox="0 0 24 24" fill="none"
+                stroke="currentColor">
+                <path d="M9 18l6-6-6-6" />
+              </svg></button>
+            <button class="hub-btn down" data-ptz="down" title="Down"><svg viewBox="0 0 24 24" fill="none"
+                stroke="currentColor">
+                <path d="M6 9l6 6 6-6" />
+              </svg></button>
+          </div>
         </div>
       </div>
-    </div>
+
+      <div class="video-overlay-msg" id="videoOverlay">
+        <div class="msg-card">
+          <h2 id="overlayTitle">Stream offline</h2>
+          <p id="overlaySubtitle">Trying to establish connection...</p>
+          <button class="action-btn" id="reloadBtn" style="margin: 0 auto;">
+            <svg style="width:16px; height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+            </svg>
+            Reconnect
+          </button>
+        </div>
+      </div>
+    </main>
+
   </div>
 
   <noscript>
     <div class="status-toast visible">Enable JavaScript for controls</div>
   </noscript>
 
-  <div class="status-toast" id="status" role="status" aria-live="polite">Ready</div>
+  <div class="status-toast" id="status" role="status" aria-live="polite">
+    <div style="width: 8px; height: 8px; border-radius: 50%; background: #000;"></div>
+    <span>Ready</span>
+  </div>
+
 
   <script>
     const statusEl = document.getElementById('status');
@@ -678,16 +540,8 @@
     const overlaySubtitleEl = document.getElementById('overlaySubtitle');
     const reloadBtn = document.getElementById('reloadBtn');
 
-    const streamDotEl = document.getElementById('streamDot');
-    const streamTextEl = document.getElementById('streamText');
-    const trackingDotEl = document.getElementById('trackingDot');
-    const trackingTextEl = document.getElementById('trackingText');
 
     const trackingToggleEl = document.getElementById('trackingToggle');
-    const zoomInBtn = document.getElementById('zoomInBtn');
-    const zoomOutBtn = document.getElementById('zoomOutBtn');
-    const stopBtn = document.getElementById('stopBtn');
-    const fitBtn = document.getElementById('fitBtn');
     const fsBtn = document.getElementById('fsBtn');
 
     let fitMode = localStorage.getItem('fitMode') || 'contain';
@@ -698,15 +552,11 @@
     }
 
     function setStreamStatus(ok, text) {
-      streamDotEl.classList.toggle('ok', !!ok);
-      streamDotEl.classList.toggle('bad', ok === false);
-      streamTextEl.textContent = text || (ok ? 'Live' : 'Offline');
+      // Elements removed for minimal UI
     }
 
     function setTrackingStatus(enabled) {
-      trackingDotEl.classList.toggle('ok', !!enabled);
-      trackingDotEl.classList.toggle('bad', enabled === false);
-      trackingTextEl.textContent = enabled ? 'Tracking' : 'Tracking Off';
+      // Elements removed for minimal UI
     }
 
     function showOverlay(title, subtitle) {
@@ -814,7 +664,14 @@
       }
     }
 
+    const quickReload = document.getElementById('quickReload');
+    quickReload.addEventListener('click', () => {
+      showStatus('Syncing feed...');
+      reloadStream();
+    });
+
     trackingToggleEl.addEventListener('change', () => toggleTracking(trackingToggleEl.checked));
+
 
     function initTrackingState() {
       fetch('/tracking')
@@ -857,10 +714,6 @@
       }
     }
 
-    fitBtn.addEventListener('click', () => {
-      fitMode = fitMode === 'contain' ? 'cover' : 'contain';
-      applyFitMode();
-    });
 
     fsBtn.addEventListener('click', async () => {
       try {
@@ -882,9 +735,6 @@
       if (key === 'arrowright') return ptz('right');
       if (key === 'arrowup') return ptz('up');
       if (key === 'arrowdown') return ptz('down');
-      if (key === '+' || key === '=') return ptz('zoom_in');
-      if (key === '-' || key === '_') return ptz('zoom_out');
-      if (key === ' ') return ptz('stop');
       if (key === 't') {
         trackingToggleEl.checked = !trackingToggleEl.checked;
         return toggleTracking(trackingToggleEl.checked);
@@ -961,26 +811,46 @@
 
       for (const detection of result.detections) {
         const category = detection.categories[0];
-        // Only show person/baby if you want, or everything
         if (category.categoryName !== 'person') continue;
 
         const { originX, originY, width, height } = detection.boundingBox;
 
-        // Draw box
-        ctx.strokeStyle = "#3b82f6";
-        ctx.lineWidth = 3;
-        ctx.strokeRect(originX, originY, width, height);
+        // Premium Box Design
+        ctx.strokeStyle = "rgba(59, 130, 246, 0.8)";
+        ctx.lineWidth = 2;
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = "rgba(59, 130, 246, 0.5)";
 
-        // Draw label
-        ctx.fillStyle = "#3b82f6";
-        const label = "Baby " + Math.round(category.score * 100) + "%";
-        ctx.font = "bold 14px -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif";
+        // Rounded corners for the box
+        const r = 12; // radius
+        ctx.beginPath();
+        ctx.moveTo(originX + r, originY);
+        ctx.lineTo(originX + width - r, originY);
+        ctx.quadraticCurveTo(originX + width, originY, originX + width, originY + r);
+        ctx.lineTo(originX + width, originY + height - r);
+        ctx.quadraticCurveTo(originX + width, originY + height, originX + width - r, originY + height);
+        ctx.lineTo(originX + r, originY + height);
+        ctx.quadraticCurveTo(originX, originY + height, originX, originY + height - r);
+        ctx.lineTo(originX, originY + r);
+        ctx.quadraticCurveTo(originX, originY, originX + r, originY);
+        ctx.stroke();
+
+        // Draw label with glass effect
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = "rgba(59, 130, 246, 0.9)";
+        const label = "Baby Detected • " + Math.round(category.score * 100) + "%";
+        ctx.font = "500 12px 'Outfit', sans-serif";
         const textWidth = ctx.measureText(label).width;
-        ctx.fillRect(originX, originY - 20, textWidth + 10, 20);
+
+        // Label background
+        ctx.fillRect(originX, originY - 30, textWidth + 24, 24);
+
+        // Label text
         ctx.fillStyle = "white";
-        ctx.fillText(label, originX + 5, originY - 5);
+        ctx.fillText(label, originX + 12, originY - 14);
       }
     }
+
 
     window.requestAnimationFrame(renderLoop);
   </script>
