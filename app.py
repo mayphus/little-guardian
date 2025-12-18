@@ -74,14 +74,6 @@ class FrameGrabber:
                 continue
             
             if ok:
-                # Store raw frame for tracker
-                with self.lock:
-                    self.raw_frame = frame.copy()
-
-                # Draw HUD using latest tracker results (non-blocking)
-                if tracker.enabled:
-                    tracker.draw_overlay(frame)
-
                 ok, buf = cv2.imencode(".jpg", frame)
                 if ok:
                     with self.lock:
@@ -91,10 +83,6 @@ class FrameGrabber:
     def get_frame(self):
         with self.lock:
             return self.frame
-
-    def get_raw_frame(self):
-        with self.lock:
-            return self.raw_frame if self.raw_frame is not None else None
 
     def stop(self):
         self.running = False
@@ -213,102 +201,27 @@ def health():
     frame_ok = grabber.get_frame() is not None
     return jsonify(
         {
-            "rtsp_url": RTSP_URL,
+            "frame_ok": frame_ok,
+            "rtsp_host": parsed.hostname,
+            "rtsp_port": CAM_RTSP_PORT,
         }
     )
 
 
-from ultralytics import YOLO
-from ultralytics.utils.plotting import colors
-
-class Tracker:
-    def __init__(self):
-        self.enabled = True
-        # Load the YOLOv8 model
-        self.model = YOLO("yolov8n.pt")
-        self.boxes = []
-
-    def draw_hud(self, frame, x1, y1, x2, y2, label="Baby"):
-        # Get color for class 0 (Person) from ultralytics
-        # colors returns RGB, convert to BGR for OpenCV
-        r, g, b = colors(0, True)
-        color = (b, g, r)
-        
-        # Box
-        cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
-        
-        # Label
-        font_thickness = 1
-        font_scale = 1
-        text_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, font_scale, font_thickness)[0]
-        
-        c2 = x1 + text_size[0], y1 - text_size[1] - 3
-        
-        cv2.rectangle(frame, (x1, y1), c2, color, -1, cv2.LINE_AA)  # filled
-        cv2.putText(frame, label, (x1, y1 - 2), 0, font_scale, (255, 255, 255), font_thickness, lineType=cv2.LINE_AA)
-
-    def draw_overlay(self, frame):
-        # Draw all current boxes
-        for (x1, y1, x2, y2, label) in self.boxes:
-            self.draw_hud(frame, x1, y1, x2, y2, label)
-
-    def start(self):
-        threading.Thread(target=self._loop, daemon=True).start()
-
-    def _loop(self):
-        while True:
-            if not self.enabled:
-                time.sleep(1)
-                continue
-
-            frame = grabber.get_raw_frame()
-            if frame is None:
-                time.sleep(0.1)
-                continue
-
-            # Resize for inference (maintain aspect ratio)
-            height, width = frame.shape[:2]
-            scale = 320 / max(height, width)
-            if scale < 1:
-                inp = cv2.resize(frame, (0, 0), fx=scale, fy=scale)
-            else:
-                inp = frame
-
-            # Run inference
-            results = self.model(inp, verbose=False)
-
-            new_boxes = []
-            for result in results:
-                boxes = result.boxes
-                for box in boxes:
-                    # Bounding box coordinates (scaled back)
-                    x1, y1, x2, y2 = box.xyxy[0].cpu().numpy()
-                    cls = int(box.cls[0].item())
-                    label = self.model.names[cls]
-                    
-                    if scale < 1:
-                        x1, y1, x2, y2 = x1/scale, y1/scale, x2/scale, y2/scale
-                    
-                    x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
-                    new_boxes.append((x1, y1, x2, y2, label))
-            
-            self.boxes = new_boxes
-            time.sleep(0.5) # Run inference only twice per second
-
-tracker = Tracker()
-tracker.start()
+tracking_enabled = True
 
 @app.route("/tracking", methods=["POST"])
 def set_tracking():
+    global tracking_enabled
     data = request.json or {}
     enable = data.get("enable")
     if enable is not None:
-        tracker.enabled = bool(enable)
-    return jsonify({"enabled": tracker.enabled})
+        tracking_enabled = bool(enable)
+    return jsonify({"enabled": tracking_enabled})
 
 @app.route("/tracking", methods=["GET"])
 def get_tracking():
-    return jsonify({"enabled": tracker.enabled})
+    return jsonify({"enabled": tracking_enabled})
 
 
 if __name__ == "__main__":

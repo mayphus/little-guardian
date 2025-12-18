@@ -17,6 +17,8 @@
       --shadow-color: rgba(0, 0, 0, 0.5);
       --radius-lg: 24px;
       --radius-md: 16px;
+      --radius-sm: 12px;
+      --focus-ring: 0 0 0 3px rgba(59, 130, 246, 0.35);
     }
 
     * {
@@ -35,6 +37,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      color-scheme: dark;
     }
 
     .container {
@@ -45,6 +48,78 @@
       align-items: center;
       gap: 24px;
       padding: 20px;
+    }
+
+    .top-bar {
+      width: 100%;
+      max-width: 800px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .title {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .title h1 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.2;
+      font-weight: 650;
+      letter-spacing: 0.01em;
+    }
+
+    .subtitle {
+      margin: 0;
+      font-size: 13px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .badges {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 9999px;
+      border: 1px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 600;
+      user-select: none;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #f59e0b;
+      box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.15);
+    }
+
+    .dot.ok {
+      background: #22c55e;
+      box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.15);
+    }
+
+    .dot.bad {
+      background: #ef4444;
+      box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.15);
     }
 
     /* Video Player */
@@ -63,6 +138,60 @@
       height: 100%;
       object-fit: contain;
       display: block;
+    }
+
+    #canvas_overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .video-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      background: radial-gradient(transparent 40%, rgba(0, 0, 0, 0.5));
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .video-overlay.visible {
+      opacity: 1;
+    }
+
+    .overlay-card {
+      pointer-events: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 16px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .overlay-title {
+      font-size: 14px;
+      font-weight: 650;
+      margin: 0;
+    }
+
+    .overlay-subtitle {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin: 0;
+      text-align: center;
+      max-width: 46ch;
     }
 
     /* Control Bar */
@@ -108,6 +237,7 @@
       align-items: center;
       justify-content: center;
       transition: all 0.2s ease;
+      touch-action: manipulation;
     }
 
     .btn:hover {
@@ -119,10 +249,69 @@
       transform: scale(0.95);
     }
 
+    .btn:focus-visible {
+      outline: none;
+      box-shadow: var(--focus-ring);
+      border-color: rgba(59, 130, 246, 0.55);
+    }
+
+    .btn.primary {
+      background: rgba(59, 130, 246, 0.18);
+      border-color: rgba(59, 130, 246, 0.45);
+    }
+
+    .btn.primary:hover {
+      background: rgba(59, 130, 246, 0.28);
+      border-color: rgba(59, 130, 246, 0.65);
+    }
+
+    .btn.wide {
+      width: auto;
+      padding: 0 12px;
+      gap: 10px;
+      border-radius: var(--radius-sm);
+      font-weight: 650;
+      font-size: 13px;
+    }
+
     .btn svg {
       width: 20px;
       height: 20px;
       fill: currentColor;
+    }
+
+    .ptz-pad {
+      display: grid;
+      grid-template-columns: repeat(3, 44px);
+      grid-template-rows: repeat(3, 44px);
+      gap: 10px;
+      padding: 6px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .ptz-pad .btn {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-sm);
+    }
+
+    .ptz-pad .btn.center {
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .ptz-pad .spacer {
+      width: 44px;
+      height: 44px;
+    }
+
+    .aux-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
     }
 
     /* Toggle Switch */
@@ -188,10 +377,21 @@
       box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
       transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       z-index: 100;
+      pointer-events: none;
     }
 
     .status-toast.visible {
       transform: translateX(-50%) translateY(0);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .status-toast {
+        transition: none;
+      }
+
+      .btn {
+        transition: none;
+      }
     }
 
     /* Mobile Optimization */
@@ -200,6 +400,15 @@
         width: 100%;
         padding: 12px;
         gap: 16px;
+      }
+
+      .top-bar {
+        max-width: 100%;
+      }
+
+      .badges .badge {
+        padding: 7px 10px;
+        font-size: 12px;
       }
 
       .video-wrapper {
@@ -218,12 +427,6 @@
         justify-content: space-between;
       }
 
-      /* Center PTZ controls on mobile */
-      .control-group:first-child {
-        width: auto;
-        justify-content: center;
-      }
-
       .control-label {
         display: none;
         /* Hide labels to save space */
@@ -233,6 +436,21 @@
         width: 40px;
         height: 40px;
         background: rgba(0, 0, 0, 0.3);
+      }
+
+      .ptz-pad {
+        grid-template-columns: repeat(3, 40px);
+        grid-template-rows: repeat(3, 40px);
+      }
+
+      .ptz-pad .btn,
+      .ptz-pad .spacer {
+        width: 40px;
+        height: 40px;
+      }
+
+      .aux-controls {
+        justify-content: space-between;
       }
     }
 
@@ -244,6 +462,20 @@
         padding: 0;
         margin: 0;
         gap: 0;
+      }
+
+      .top-bar {
+        position: fixed;
+        top: 14px;
+        left: 14px;
+        right: 14px;
+        max-width: none;
+        z-index: 20;
+        pointer-events: none;
+      }
+
+      .top-bar>* {
+        pointer-events: auto;
       }
 
       .video-wrapper {
@@ -290,6 +522,13 @@
         height: 40px;
         background: rgba(0, 0, 0, 0.3);
       }
+
+      .ptz-pad {
+        border: none;
+        background: transparent;
+        padding: 0;
+        gap: 10px;
+      }
     }
   </style>
 </head>
@@ -297,9 +536,40 @@
 <body>
 
   <div class="container">
+    <div class="top-bar">
+      <div class="title">
+        <h1>Baby Monitor</h1>
+        <p class="subtitle" id="hint">Arrow keys: move • +/-: zoom • F: fullscreen</p>
+      </div>
+      <div class="badges">
+        <div class="badge" id="streamBadge" title="Stream status">
+          <span class="dot" id="streamDot"></span>
+          <span id="streamText">Connecting</span>
+        </div>
+        <div class="badge" id="trackingBadge" title="Tracking status">
+          <span class="dot" id="trackingDot"></span>
+          <span id="trackingText">Tracking</span>
+        </div>
+      </div>
+    </div>
+
     <!-- Video Feed -->
     <div class="video-wrapper">
-      <img id="video" src="/video.mjpg" alt="Live Stream">
+      <img id="video" src="/video.mjpg" alt="Live Stream" decoding="async">
+      <canvas id="canvas_overlay"></canvas>
+      <div class="video-overlay" id="videoOverlay" aria-hidden="true">
+        <div class="overlay-card">
+          <p class="overlay-title" id="overlayTitle">Stream issue</p>
+          <p class="overlay-subtitle" id="overlaySubtitle">Trying to reconnect…</p>
+          <button class="btn wide primary" id="reloadBtn" type="button" aria-label="Reload stream">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M17.65 6.35A7.95 7.95 0 0012 4V1L7 6l5 5V7a6 6 0 11-6 6H4a8 8 0 108-8c-1.85 0-3.55.63-4.9 1.69L8.1 8.69A6.02 6.02 0 0112 7a6 6 0 016 6 6 6 0 01-10.24 4.24l-1.42 1.42A8 8 0 1017.65 6.35z" />
+            </svg>
+            Reload
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Controls -->
@@ -307,40 +577,86 @@
       <!-- PTZ -->
       <div class="control-group">
         <span class="control-label">Camera</span>
-        <button class="btn" onclick="ptz('left')" title="Pan Left">
-          <svg viewBox="0 0 24 24">
-            <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
-          </svg>
-        </button>
-        <button class="btn" onclick="ptz('up')" title="Tilt Up">
-          <svg viewBox="0 0 24 24">
-            <path d="M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z" />
-          </svg>
-        </button>
-        <button class="btn" onclick="ptz('down')" title="Tilt Down">
-          <svg viewBox="0 0 24 24">
-            <path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z" />
-          </svg>
-        </button>
-        <button class="btn" onclick="ptz('right')" title="Pan Right">
-          <svg viewBox="0 0 24 24">
-            <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
-          </svg>
-        </button>
+        <div class="ptz-pad" aria-label="Pan tilt controls">
+          <div class="spacer" aria-hidden="true"></div>
+          <button class="btn" data-ptz="up" type="button" title="Tilt Up" aria-label="Tilt up">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z" />
+            </svg>
+          </button>
+          <div class="spacer" aria-hidden="true"></div>
+
+          <button class="btn" data-ptz="left" type="button" title="Pan Left" aria-label="Pan left">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+            </svg>
+          </button>
+          <button class="btn center" data-ptz="home" type="button" title="Home" aria-label="Home position">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+            </svg>
+          </button>
+          <button class="btn" data-ptz="right" type="button" title="Pan Right" aria-label="Pan right">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
+            </svg>
+          </button>
+
+          <div class="spacer" aria-hidden="true"></div>
+          <button class="btn" data-ptz="down" type="button" title="Tilt Down" aria-label="Tilt down">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z" />
+            </svg>
+          </button>
+          <div class="spacer" aria-hidden="true"></div>
+        </div>
       </div>
 
       <!-- Tracking -->
       <div class="control-group">
         <span class="control-label">AI Tracking</span>
-        <label class="toggle-switch">
-          <input type="checkbox" id="trackingToggle" onchange="toggleTracking(this)">
-          <span class="slider"></span>
-        </label>
+        <div class="aux-controls">
+          <button class="btn" id="zoomOutBtn" data-ptz="zoom_out" type="button" title="Zoom Out" aria-label="Zoom out">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zM9.5 14C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14zM7 9h5v1H7z" />
+            </svg>
+          </button>
+          <button class="btn" id="zoomInBtn" data-ptz="zoom_in" type="button" title="Zoom In" aria-label="Zoom in">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zM9.5 14C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14zM10 7h-1v2H7v1h2v2h1v-2h2V9h-2V7z" />
+            </svg>
+          </button>
+          <button class="btn" id="stopBtn" data-ptz="stop" type="button" title="Stop" aria-label="Stop movement">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6 6h12v12H6z" />
+            </svg>
+          </button>
+          <button class="btn" id="fitBtn" type="button" title="Toggle fit" aria-label="Toggle fit mode">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M7 14H5v5h5v-2H7v-3zm0-4h2V7h3V5H5v5zm10 7h-3v2h5v-5h-2v3zm0-12V5h-5v2h3v3h2V5z" />
+            </svg>
+          </button>
+          <button class="btn" id="fsBtn" type="button" title="Fullscreen" aria-label="Toggle fullscreen">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M7 14H5v5h5v-2H7v-3zm0-4h2V7h3V5H5v5zm10 7h-3v2h5v-5h-2v3zm0-12V5h-5v2h3v3h2V5z" />
+            </svg>
+          </button>
+          <label class="toggle-switch" title="Toggle tracking">
+            <input type="checkbox" id="trackingToggle" aria-label="Toggle AI tracking">
+            <span class="slider"></span>
+          </label>
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="status-toast" id="status">Ready</div>
+  <noscript>
+    <div class="status-toast visible">Enable JavaScript for controls</div>
+  </noscript>
+
+  <div class="status-toast" id="status" role="status" aria-live="polite">Ready</div>
 
   <script>
     const statusEl = document.getElementById('status');
@@ -355,8 +671,71 @@
       }, 2000);
     }
 
+    const videoEl = document.getElementById('video');
+    const videoWrapperEl = document.querySelector('.video-wrapper');
+    const overlayEl = document.getElementById('videoOverlay');
+    const overlayTitleEl = document.getElementById('overlayTitle');
+    const overlaySubtitleEl = document.getElementById('overlaySubtitle');
+    const reloadBtn = document.getElementById('reloadBtn');
+
+    const streamDotEl = document.getElementById('streamDot');
+    const streamTextEl = document.getElementById('streamText');
+    const trackingDotEl = document.getElementById('trackingDot');
+    const trackingTextEl = document.getElementById('trackingText');
+
+    const trackingToggleEl = document.getElementById('trackingToggle');
+    const zoomInBtn = document.getElementById('zoomInBtn');
+    const zoomOutBtn = document.getElementById('zoomOutBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const fitBtn = document.getElementById('fitBtn');
+    const fsBtn = document.getElementById('fsBtn');
+
+    let fitMode = localStorage.getItem('fitMode') || 'contain';
+    function applyFitMode() {
+      videoEl.style.objectFit = fitMode;
+      localStorage.setItem('fitMode', fitMode);
+      showStatus('Fit: ' + (fitMode === 'cover' ? 'Fill' : 'Fit'));
+    }
+
+    function setStreamStatus(ok, text) {
+      streamDotEl.classList.toggle('ok', !!ok);
+      streamDotEl.classList.toggle('bad', ok === false);
+      streamTextEl.textContent = text || (ok ? 'Live' : 'Offline');
+    }
+
+    function setTrackingStatus(enabled) {
+      trackingDotEl.classList.toggle('ok', !!enabled);
+      trackingDotEl.classList.toggle('bad', enabled === false);
+      trackingTextEl.textContent = enabled ? 'Tracking' : 'Tracking Off';
+    }
+
+    function showOverlay(title, subtitle) {
+      overlayTitleEl.textContent = title;
+      overlaySubtitleEl.textContent = subtitle;
+      overlayEl.classList.add('visible');
+      overlayEl.setAttribute('aria-hidden', 'false');
+    }
+
+    function hideOverlay() {
+      overlayEl.classList.remove('visible');
+      overlayEl.setAttribute('aria-hidden', 'true');
+    }
+
+    function reloadStream() {
+      const url = new URL('/video.mjpg', window.location.href);
+      url.searchParams.set('t', String(Date.now()));
+      videoEl.src = url.toString();
+    }
+
+    reloadBtn.addEventListener('click', () => {
+      showStatus('Reloading stream');
+      reloadStream();
+    });
+
+    let ptzInFlight = 0;
     async function ptz(action) {
       try {
+        ptzInFlight++;
         const res = await fetch('/ptz', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -370,11 +749,55 @@
         }
       } catch (e) {
         showStatus('Network Error');
+      } finally {
+        ptzInFlight = Math.max(0, ptzInFlight - 1);
       }
     }
 
-    async function toggleTracking(el) {
-      const enable = el.checked;
+    function bindHoldToRepeat(el, action) {
+      let timer = null;
+      let active = false;
+      let lastPointerDownAt = 0;
+
+      const start = (ev) => {
+        ev.preventDefault();
+        if (active) return;
+        active = true;
+        lastPointerDownAt = performance.now();
+        ptz(action);
+        timer = window.setInterval(() => {
+          if (ptzInFlight > 2) return;
+          ptz(action);
+        }, 250);
+      };
+      const stop = () => {
+        active = false;
+        if (timer) window.clearInterval(timer);
+        timer = null;
+      };
+
+      el.addEventListener('pointerdown', start);
+      el.addEventListener('pointerup', stop);
+      el.addEventListener('pointercancel', stop);
+      el.addEventListener('pointerleave', stop);
+      el.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        if (performance.now() - lastPointerDownAt < 600) return; // avoid double fire after pointerdown
+        ptz(action);
+      });
+    }
+
+    document.querySelectorAll('[data-ptz]').forEach((el) => {
+      const action = el.getAttribute('data-ptz');
+      if (!action) return;
+      if (action === 'left' || action === 'right' || action === 'up' || action === 'down' || action === 'zoom_in' || action === 'zoom_out') {
+        bindHoldToRepeat(el, action);
+      } else {
+        el.addEventListener('click', () => ptz(action));
+      }
+    });
+
+    async function toggleTracking(enable) {
       try {
         const res = await fetch('/tracking', {
           method: 'POST',
@@ -382,21 +805,184 @@
           body: JSON.stringify({ enable })
         });
         const data = await res.json();
+        setTrackingStatus(!!data.enabled);
         showStatus('Tracking ' + (data.enabled ? 'Enabled' : 'Disabled'));
-        el.checked = data.enabled;
+        trackingToggleEl.checked = !!data.enabled;
       } catch (e) {
         showStatus('Error toggling tracking');
-        el.checked = !enable; // Revert
+        trackingToggleEl.checked = !enable; // Revert
       }
     }
 
-    // Init tracking state
-    fetch('/tracking')
-      .then(res => res.json())
-      .then(data => {
-        document.getElementById('trackingToggle').checked = data.enabled;
-      })
-      .catch(console.error);
+    trackingToggleEl.addEventListener('change', () => toggleTracking(trackingToggleEl.checked));
+
+    function initTrackingState() {
+      fetch('/tracking')
+        .then(res => res.json())
+        .then(data => {
+          trackingToggleEl.checked = !!data.enabled;
+          setTrackingStatus(!!data.enabled);
+        })
+        .catch(() => {
+          setTrackingStatus(false);
+        });
+    }
+
+    function initStreamState() {
+      setStreamStatus(null, 'Connecting');
+      showOverlay('Connecting', 'Waiting for the first frame…');
+      videoEl.addEventListener('load', () => {
+        setStreamStatus(true, 'Live');
+        hideOverlay();
+      }, { once: true });
+
+      videoEl.addEventListener('error', () => {
+        setStreamStatus(false, 'Offline');
+        showOverlay('Stream offline', 'Tap Reload to reconnect.');
+      });
+    }
+
+    async function pollHealth() {
+      try {
+        const res = await fetch('/health', { cache: 'no-store' });
+        if (!res.ok) throw new Error('Bad response');
+        const data = await res.json();
+        const ok = data && data.frame_ok === true;
+        setStreamStatus(ok, ok ? 'Live' : 'No frame');
+        if (!ok) showOverlay('No frames', 'Check camera connection, then Reload.');
+        if (ok) hideOverlay();
+      } catch (_) {
+        setStreamStatus(false, 'Offline');
+        showOverlay('Offline', 'Cannot reach server. Check Wi‑Fi/VPN.');
+      }
+    }
+
+    fitBtn.addEventListener('click', () => {
+      fitMode = fitMode === 'contain' ? 'cover' : 'contain';
+      applyFitMode();
+    });
+
+    fsBtn.addEventListener('click', async () => {
+      try {
+        if (!document.fullscreenElement) {
+          await videoWrapperEl.requestFullscreen();
+          showStatus('Fullscreen');
+        } else {
+          await document.exitFullscreen();
+        }
+      } catch (_) {
+        showStatus('Fullscreen not available');
+      }
+    });
+
+    document.addEventListener('keydown', (ev) => {
+      if (ev.repeat) return;
+      const key = ev.key.toLowerCase();
+      if (key === 'arrowleft') return ptz('left');
+      if (key === 'arrowright') return ptz('right');
+      if (key === 'arrowup') return ptz('up');
+      if (key === 'arrowdown') return ptz('down');
+      if (key === '+' || key === '=') return ptz('zoom_in');
+      if (key === '-' || key === '_') return ptz('zoom_out');
+      if (key === ' ') return ptz('stop');
+      if (key === 't') {
+        trackingToggleEl.checked = !trackingToggleEl.checked;
+        return toggleTracking(trackingToggleEl.checked);
+      }
+      if (key === 'f') return fsBtn.click();
+    });
+
+    applyFitMode();
+    initStreamState();
+    initTrackingState();
+    pollHealth();
+    setInterval(pollHealth, 2500);
+  </script>
+
+  <script type="module">
+    import {
+      ObjectDetector,
+      FilesetResolver
+    } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.2";
+
+    const video = document.getElementById("video");
+    const canvasOverlay = document.getElementById("canvas_overlay");
+    const ctx = canvasOverlay.getContext("2d");
+    const trackingToggle = document.getElementById("trackingToggle");
+
+    let objectDetector;
+    let runningMode = "IMAGE";
+
+    // Initialize the object detector
+    const initializeObjectDetector = async () => {
+      const vision = await FilesetResolver.forVisionTasks(
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.2/wasm"
+      );
+      objectDetector = await ObjectDetector.createFromOptions(vision, {
+        baseOptions: {
+          modelAssetPath: `https://storage.googleapis.com/mediapipe-models/object_detector/efficientdet_lite0/float16/1/efficientdet_lite0.tflite`,
+          delegate: "GPU"
+        },
+        scoreThreshold: 0.4,
+        runningMode: runningMode
+      });
+    };
+    initializeObjectDetector();
+
+    let lastVideoTime = -1;
+    async function renderLoop() {
+      if (!objectDetector || !trackingToggle.checked) {
+        ctx.clearRect(0, 0, canvasOverlay.width, canvasOverlay.height);
+        window.requestAnimationFrame(renderLoop);
+        return;
+      }
+
+      // Ensure canvas size matches displayed image size for accurate coordinates
+      if (video.complete && video.naturalWidth > 0) {
+        // Sync canvas size with video displayed size
+        const rect = video.getBoundingClientRect();
+        if (canvasOverlay.width !== rect.width || canvasOverlay.height !== rect.height) {
+          canvasOverlay.width = rect.width;
+          canvasOverlay.height = rect.height;
+        }
+
+        // Run detection
+        // Note: For MJPEG streams, we use 'detect' instead of 'detectForVideo' 
+        // because we don't have a real VideoElement stream with timestamps.
+        const detections = objectDetector.detect(video);
+        displayDetections(detections);
+      }
+
+      window.requestAnimationFrame(renderLoop);
+    }
+
+    function displayDetections(result) {
+      ctx.clearRect(0, 0, canvasOverlay.width, canvasOverlay.height);
+
+      for (const detection of result.detections) {
+        const category = detection.categories[0];
+        // Only show person/baby if you want, or everything
+        if (category.categoryName !== 'person') continue;
+
+        const { originX, originY, width, height } = detection.boundingBox;
+
+        // Draw box
+        ctx.strokeStyle = "#3b82f6";
+        ctx.lineWidth = 3;
+        ctx.strokeRect(originX, originY, width, height);
+
+        // Draw label
+        ctx.fillStyle = "#3b82f6";
+        const label = "Baby " + Math.round(category.score * 100) + "%";
+        ctx.font = "bold 14px -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif";
+        const textWidth = ctx.measureText(label).width;
+        ctx.fillRect(originX, originY - 20, textWidth + 10, 20);
+        ctx.fillStyle = "white";
+        ctx.fillText(label, originX + 5, originY - 5);
+      }
+    }
+
+    window.requestAnimationFrame(renderLoop);
   </script>
 </body>
 
