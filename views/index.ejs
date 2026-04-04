@@ -705,9 +705,17 @@
         if (!res.ok) throw new Error('Bad response');
         const data = await res.json();
         const ok = data && data.frame_ok === true;
-        setStreamStatus(ok, ok ? 'Live' : 'No frame');
-        if (!ok) showOverlay('No frames', 'Check camera connection, then Reload.');
-        if (ok) hideOverlay();
+        const starting = data && data.stream_starting === true;
+        setStreamStatus(ok, ok ? 'Live' : (starting ? 'Connecting' : 'No frame'));
+        if (ok) {
+          hideOverlay();
+          return;
+        }
+        if (starting) {
+          showOverlay('Connecting', 'Waiting for the first frame…');
+          return;
+        }
+        showOverlay('No frames', 'Check camera connection, then Reload.');
       } catch (_) {
         setStreamStatus(false, 'Offline');
         showOverlay('Offline', 'Cannot reach server. Check Wi‑Fi/VPN.');

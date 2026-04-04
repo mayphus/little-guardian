@@ -47,6 +47,8 @@ initOnvif();
 
 // Frame status for health check
 let lastFrameTime = 0;
+let activeStreams = 0;
+let streamStartingSince = 0;
 
 // API Routes
 app.get('/', (req, res) => {
@@ -55,6 +57,9 @@ app.get('/', (req, res) => {
 
 // MJPEG Stream using FFmpeg
 app.get('/video.mjpg', (req, res) => {
+    activeStreams += 1;
+    streamStartingSince = Date.now();
+
     res.writeHead(200, {
         'Content-Type': 'multipart/x-mixed-replace; boundary=--frame',
         'Cache-Control': 'no-cache',
@@ -76,8 +81,15 @@ app.get('/video.mjpg', (req, res) => {
             console.log('FFmpeg stream started');
         })
         .on('error', (err) => {
+            const intentionalStop = err && /SIG(?:KILL|TERM)/.test(String(err.message || ''));
+            if (intentionalStop) {
+                return;
+            }
             console.error('FFmpeg error:', err.message);
             res.end();
+        })
+        .on('end', () => {
+            console.log('FFmpeg stream ended');
         });
 
     const ffstream = command.pipe();
@@ -105,6 +117,7 @@ app.get('/video.mjpg', (req, res) => {
             buffer = buffer.slice(eoi + 2);
 
             lastFrameTime = Date.now();
+            streamStartingSince = 0;
             res.write(`--frame\r\nContent-Type: image/jpeg\r\nContent-Length: ${frame.length}\r\n\r\n`);
             res.write(frame);
             res.write('\r\n');
@@ -113,6 +126,7 @@ app.get('/video.mjpg', (req, res) => {
 
 
     req.on('close', () => {
+        activeStreams = Math.max(0, activeStreams - 1);
         command.kill();
         console.log('FFmpeg stream stopped');
     });
@@ -161,9 +175,15 @@ app.post('/ptz', async (req, res) => {
 
 // Health check
 app.get('/health', (req, res) => {
-    const frameOk = (Date.now() - lastFrameTime) < 5000;
+    const now = Date.now();
+    const frameAgeMs = lastFrameTime > 0 ? now - lastFrameTime : null;
+    const starting = streamStartingSince > 0 && (now - streamStartingSince) < 15000;
+    const frameOk = frameAgeMs !== null && frameAgeMs < 5000;
     res.json({
         frame_ok: frameOk,
+        stream_starting: starting,
+        active_streams: activeStreams,
+        frame_age_ms: frameAgeMs,
         rtsp_host: ONVIF_HOST
     });
 });
