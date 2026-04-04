@@ -1,5 +1,5 @@
 {
-  "name": "baby-camera",
+  "name": "little-guardian",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
@@ -9,15 +9,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mayphus/baby-camera.git"
+    "url": "git+https://github.com/mayphus/little-guardian.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/mayphus/baby-camera/issues"
+    "url": "https://github.com/mayphus/little-guardian/issues"
   },
-  "homepage": "https://github.com/mayphus/baby-camera#readme",
+  "homepage": "https://github.com/mayphus/little-guardian#readme",
   "dependencies": {
     "dotenv": "^17.2.3",
     "ejs": "^3.1.10",
