@@ -3,6 +3,7 @@ node_modules/
 
 # Environment variables
 .env
+.frigate-pb62.tmp.yml
 
 # Logs
 npm-debug.log*
