@@ -5,27 +5,16 @@ mqtt:
 tls:
   enabled: false
 
-ffmpeg:
-  hwaccel_args: preset-vaapi
+go2rtc:
+  streams:
+    baby_room:
+      - rtsp://{FRIGATE_CAMERA_USER}:{FRIGATE_CAMERA_PASSWORD}@{FRIGATE_CAMERA_HOST}:554/stream1
+    baby_room_sub:
+      - rtsp://{FRIGATE_CAMERA_USER}:{FRIGATE_CAMERA_PASSWORD}@{FRIGATE_CAMERA_HOST}:554/stream2
 
 detectors:
-  ov:
-    type: openvino
-    device: GPU
-
-model:
-  width: 300
-  height: 300
-  input_tensor: nhwc
-  input_pixel_format: bgr
-  path: /openvino-model/ssdlite_mobilenet_v2.xml
-  labelmap_path: /openvino-model/coco_91cl_bkgr.txt
-
-record:
-  enabled: true
-  retain:
-    days: 3
-    mode: motion
+  cpu1:
+    type: cpu
 
 snapshots:
   enabled: true
@@ -47,9 +36,11 @@ cameras:
         - person
     ffmpeg:
       inputs:
-        - path: rtsp://{FRIGATE_CAMERA_USER}:{FRIGATE_CAMERA_PASSWORD}@{FRIGATE_CAMERA_HOST}:554/stream2
+        - path: rtsp://127.0.0.1:8554/baby_room_sub
+          input_args: preset-rtsp-restream
           roles:
             - detect
-        - path: rtsp://{FRIGATE_CAMERA_USER}:{FRIGATE_CAMERA_PASSWORD}@{FRIGATE_CAMERA_HOST}:554/stream1
+        - path: rtsp://127.0.0.1:8554/baby_room
+          input_args: preset-rtsp-restream
           roles:
             - record

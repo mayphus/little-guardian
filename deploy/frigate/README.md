@@ -11,6 +11,13 @@ This is the smallest Frigate setup for `pb62`.
 This directory is the repo-safe starting point. The live `pb62` camera config may
 be rendered from local secrets and should not be committed back into the repo.
 
+The current recommended setup for this project is:
+
+- use `go2rtc` to restream the camera
+- use the low-res substream for detection
+- leave Frigate recording disabled because the camera already records
+- keep Frigate focused on live view, detection, snapshots, and review
+
 ## First start
 
 Run on `pb62`:
