@@ -1,0 +1,55 @@
+# yaml-language-server: $schema=http://frigate_host:5000/api/config/schema.json
+mqtt:
+  enabled: false
+
+tls:
+  enabled: false
+
+ffmpeg:
+  hwaccel_args: preset-vaapi
+
+detectors:
+  ov:
+    type: openvino
+    device: GPU
+
+model:
+  width: 300
+  height: 300
+  input_tensor: nhwc
+  input_pixel_format: bgr
+  path: /openvino-model/ssdlite_mobilenet_v2.xml
+  labelmap_path: /openvino-model/coco_91cl_bkgr.txt
+
+record:
+  enabled: true
+  retain:
+    days: 3
+    mode: motion
+
+snapshots:
+  enabled: true
+  retain:
+    default: 7
+
+birdseye:
+  enabled: true
+
+cameras:
+  baby_room:
+    enabled: true
+    detect:
+      width: 640
+      height: 360
+      fps: 5
+    objects:
+      track:
+        - person
+    ffmpeg:
+      inputs:
+        - path: rtsp://{FRIGATE_CAMERA_USER}:{FRIGATE_CAMERA_PASSWORD}@{FRIGATE_CAMERA_HOST}:554/stream2
+          roles:
+            - detect
+        - path: rtsp://{FRIGATE_CAMERA_USER}:{FRIGATE_CAMERA_PASSWORD}@{FRIGATE_CAMERA_HOST}:554/stream1
+          roles:
+            - record
