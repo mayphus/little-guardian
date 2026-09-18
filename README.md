@@ -1,3 +1,7 @@
+> **Archived after consolidation — 18 September 2026.** Maintenance and original Git history now live in [orchestrator](https://github.com/mayphus/orchestrator/tree/main/apps/frigate). The successor source repository is private. This repository is retained as a historical reference; use the successor for new work.
+
+---
+
 # little-guardian
 
 This repository is now primarily a Frigate deployment project for `pb62`.
